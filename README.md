@@ -1,73 +1,107 @@
-โปรเจคนี้พัฒนาด้วยโครงสร้างแบบ hexagonal architecture เพื่อสำหรับรองรับการขยายต่อและสามารถต่อยอดได้
+# Task Management API
 
+โปรเจคนี้พัฒนาด้วยโครงสร้างแบบ **Hexagonal Architecture** เพื่อสำหรับรองรับการขยายต่อและสามารถต่อยอดได้
 
-└── 📁 golangTest
-    ├── 📁 adapter
-    │   ├── 📁 handler
-    │   │   ├── 🐹 response.go /// helper response + errpr handler function
-    │   │   ├── 🐹 taskHandler.go /// http adapter
-    │   │   └── 🐹 taskHandler_test.go
-    │   └── 📁 repository
-    │       ├── 🐹 taskRepositorySql.go ///database adapter
-    │       └── 🐹 taskRepository_test.go
-    ├── 📁 core
-    │   ├── 📁 entity
-    │   │   └── 🐹 task.go /// base entity 
-    │   ├── 📁 port
-    │   │   └── 🐹 taskPort.go
-    │   └── 📁 service
-    │       ├── 🐹 taskService.go /// bussiness logic
-    │       └── 🐹 taskService_test.go
-    ├── 📁 pkg
-    │   └── 📁 errs
-    │       └── 🐹 errs.go /// errors
-    ├── 📁 routes
-    │   └── 🐹 routes.go
-    ├── 🐳 Dockerfile
-    ├── ⚙️ docker-compose.yml
-    ├── 📄 go.mod
-    ├── 📄 go.sum
-    ├── 🐹 main.go
-    └── 📄 tasks.db
+---
 
-Running Project
-    1.use go command
-        cd เข้า folder ของ gotest
-        ใช้คำสั่ง go run main.go หรือ go run .
+## 📁 Project Structure
 
-        หรืออีกวิธีคือ go build -o main.exe main.go เพื่อสร้าง file สำหรับการใช้งานโดยที่ไม่ต้อง compile ซ้ำ
-        จากนั้นใข้คำสั่ง ./main.exe เพื่อรันโปรเจค
+```
+golangTest/
+├── adapter/              # External adapters
+│   ├── handler/         # HTTP handler (input adapter)
+│   │   ├── response.go
+│   │   ├── taskHandler.go
+│   │   └── taskHandler_test.go
+│   └── repository/      # Database adapter (output adapter)
+│       ├── taskRepositorySql.go
+│       └── taskRepository_test.go
+├── core/                # Business logic (framework independent)
+│   ├── entity/         # Domain models
+│   ├── port/           # Interfaces (contracts)
+│   └── service/        # Business logic
+├── pkg/                 # Shared packages
+│   └── errs/           # Error handling
+├── routes/              # Route configuration
+├── Dockerfile
+├── docker-compose.yml
+├── go.mod
+├── go.sum
+├── main.go
+└── tasks.db
+```
 
-    2.docker 
-        cd เข้า folder ของ gotest
-        ใช้คำสั่ง docker compose up --build 
+---
 
-api 
+## 🚀 Running Project
 
-# ============ CREATE TASK ============
-+ curl -X POST http://localhost:8080/tasks \
+### วิธีที่ 1: Using Go Command
+```bash
+cd golangTest
+go run main.go
+# หรือ
+go run .
+```
+
+### วิธีที่ 2: Build then Run
+```bash
+go build -o main.exe main.go
+./main.exe
+```
+
+### วิธีที่ 3: Using Docker
+```bash
+cd golangTest
+docker compose up --build
+```
+
+---
+
+## 📚 API Documentation 
+
+---
+
+## 📚 API Documentation
+
+### 1️⃣ CREATE TASK
+
+**Request:**
+```bash
+curl -X POST http://localhost:8080/tasks \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Complete Project",
     "description": "Finish the Go project with tests and Docker",
     "assign_name": "John"
   }'
+```
 
- response {
-    "success": true,
-    "message": "task created successfully",
-    "data": {
-        "title": "Complete Project",
-        "description": "Finish the Go project with tests and Docker",
-        "assign_name": "John"
-    }
+**Response:**
+```json
+{
+  "success": true,
+  "message": "task created successfully",
+  "data": {
+    "title": "Complete Project",
+    "description": "Finish the Go project with tests and Docker",
+    "assign_name": "John"
+  }
 }
+```
 
-# ============ GET ALL TASKS ============
-+ curl -X GET "http://localhost:8080/tasks?page=1&limit=5" \
+---
+
+### 2️⃣ GET ALL TASKS (with pagination)
+
+**Request:**
+```bash
+curl -X GET "http://localhost:8080/tasks?page=1&limit=5" \
   -H "Content-Type: application/json"
+```
 
-  response {
+**Response:**
+```json
+{
   "success": true,
   "message": "Success",
   "data": [
@@ -118,11 +152,20 @@ api
     }
   ]
 }
+```
 
-# ============ GET TASKS BY ASSIGN_NAME ============
-+ curl -X GET "http://localhost:8080/tasks?assign_name=Alice&page=1&limit=5" \
+---
+
+### 3️⃣ GET TASKS BY ASSIGN_NAME
+
+**Request:**
+```bash
+curl -X GET "http://localhost:8080/tasks?assign_name=Alice&page=1&limit=5" \
   -H "Content-Type: application/json"
+```
 
+**Response:**
+```json
 {
   "success": true,
   "message": "Success",
@@ -147,12 +190,21 @@ api
     }
   ]
 }
+```
 
-# ============ GET TASKS BY STATUS ============
-+ curl -X GET "http://localhost:8080/tasks?status=todo&page=1&limit=5" \
+---
+
+### 4️⃣ GET TASKS BY STATUS
+
+**Request:**
+```bash
+curl -X GET "http://localhost:8080/tasks?status=todo&page=1&limit=5" \
   -H "Content-Type: application/json"
+```
 
-response {
+**Response:**
+```json
+{
   "success": true,
   "message": "Success",
   "data": [
@@ -176,12 +228,21 @@ response {
     }
   ]
 }
+```
 
-# ============ GET SINGLE TASK ============
-+ curl -X GET "http://localhost:8080/tasks/e7f86858-2be6-437b-9347-f3e749c3e40f" 
+---
+
+### 5️⃣ GET SINGLE TASK
+
+**Request:**
+```bash
+curl -X GET "http://localhost:8080/tasks/e7f86858-2be6-437b-9347-f3e749c3e40f" \
   -H "Content-Type: application/json"
+```
 
-response {
+**Response:**
+```json
+{
   "success": true,
   "message": "Success",
   "data": {
@@ -194,30 +255,66 @@ response {
     "update_at": "2026-04-22T01:34:43.0786007+07:00"
   }
 }
+```
 
-# ============ UPDATE TASK ============
-+ curl -X PUT "http://localhost:8080/tasks/e7f86858-2be6-437b-9347-f3e749c3e40f" \
+---
+
+### 6️⃣ UPDATE TASK
+
+**Request:**
+```bash
+curl -X PUT "http://localhost:8080/tasks/e7f86858-2be6-437b-9347-f3e749c3e40f" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Updated Task Title",
     "description": "Updated description",
     "assign_name": "UpdatedName"
   }'
+```
 
-response {"success":true,"message":"Success","data":"Task updated successfully"}
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Success",
+  "data": "Task updated successfully"
+}
+```
 
-# ============ UPDATE TASK STATUS ============
-# Status can be: pending, in_progress, done
-+ curl -X PATCH "http://localhost:8080/tasks/e7f86858-2be6-437b-9347-f3e749c3e40f/in_progress" \    
+---
+
+### 7️⃣ UPDATE TASK STATUS
+
+**Request:**
+```bash
+curl -X PATCH "http://localhost:8080/tasks/e7f86858-2be6-437b-9347-f3e749c3e40f/in_progress" \
   -H "Content-Type: application/json"
+```
 
-response {"success":true,"message":"Success","data":"Task updated successfully"}
+**Status Options:** `todo`, `in_progress`, `done`
 
-# ============ TEST PAGINATION ============
-+ curl -X GET "http://localhost:8080/tasks?page=1&limit=3" \
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Success",
+  "data": "Task updated successfully"
+}
+```
+
+---
+
+### 8️⃣ TEST PAGINATION
+
+**Request:**
+```bash
+curl -X GET "http://localhost:8080/tasks?page=1&limit=3" \
   -H "Content-Type: application/json"
+```
 
-response {
+**Response:**
+```json
+{
   "success": true,
   "message": "Success",
   "data": [
@@ -250,13 +347,21 @@ response {
     }
   ]
 }
+```
 
+---
 
-# ============ FILTER COMBINATIONS ============
-+ curl -X GET "http://localhost:8080/tasks?assign_name=Bob&status=done&page=1&limit=5" \
-  -H "Content-Type: application/json" 
+### 9️⃣ FILTER COMBINATIONS
 
-response {
+**Request:**
+```bash
+curl -X GET "http://localhost:8080/tasks?assign_name=Bob&status=done&page=1&limit=5" \
+  -H "Content-Type: application/json"
+```
+
+**Response:**
+```json
+{
   "success": true,
   "message": "Success",
   "data": [
@@ -271,8 +376,11 @@ response {
     }
   ]
 }
+```
 
-=================== At least 2 assumptions you made ===============================
+---
+
+## 💡 Assumptions
 
 1. เมื่อระบบมีการขนายเพิ่มเช่น user_id ที่จะใช้เป็น id อ้างอิงกับ task ในสถานการณ์อย่างการมอบหมายงานให้แต่ละบุคคลสามารถติดตามได้ง่าย
 
