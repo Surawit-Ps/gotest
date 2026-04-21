@@ -1,11 +1,12 @@
 package handler
 
 import (
-
+	"fmt"
 	"golangTest/core/entity"
 	"golangTest/core/port"
-	"strconv"
 	e "golangTest/pkg/errs"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,29 +18,29 @@ func NewTaskHandler(taskService port.TaskServicePort) TaskHandler {
 	return TaskHandler{taskService: taskService}
 }
 
-
 func (h *TaskHandler) CreateTask(c *gin.Context) {
 	var task entity.TaskRequest
 	if err := c.ShouldBindJSON(&task); err != nil {
-		handleError(c,e.ErrInvalidInput)
+		handleError(c, e.ErrInvalidInput)
 		return
 	}
 	taskEntity := entity.Task{
-		Title: task.Title,
+		Title:       task.Title,
 		Description: task.Description,
-		AssignName: task.AssignName,
+		AssignName:  task.AssignName,
 	}
 	err := h.taskService.CreateTask(taskEntity)
 	if err != nil {
 		handleError(c, err)
-		return 
+		return
 	}
-	ResponseCreateSuccess(c,"task created successfully", task)
+	ResponseCreateSuccess(c, "task created successfully", task)
 }
 
 func (h *TaskHandler) GetTasks(c *gin.Context) {
-	status := c.Query("status")
 	assign_name := c.Query("assign_name")
+	status := c.Query("status")
+	fmt.Print("status: ", status, " assign_name: ", assign_name)
 	page := c.DefaultQuery("page", "1")
 	limit := c.DefaultQuery("limit", "5")
 	pageInt, _ := strconv.Atoi(page)
@@ -52,10 +53,10 @@ func (h *TaskHandler) GetTasks(c *gin.Context) {
 		handleError(c, e.ErrInvalidInput)
 		return
 	}
-	tasks, err := h.taskService.GetTasks(status, assign_name, pageInt, limitInt)	
+	tasks, err := h.taskService.GetTasks(assign_name, status, pageInt, limitInt)
 	if err != nil {
 		handleError(c, err)
-		return 
+		return
 	}
 	ResponseSuccess(c, tasks)
 }
@@ -79,9 +80,9 @@ func (h *TaskHandler) UpdateTask(c *gin.Context) {
 	}
 
 	TaskEntity := entity.Task{
-		Title: task.Title,
+		Title:       task.Title,
 		Description: task.Description,
-		AssignName: task.AssignName,
+		AssignName:  task.AssignName,
 	}
 	err := h.taskService.UpdateTask(id, TaskEntity)
 	if err != nil {
@@ -100,4 +101,14 @@ func (h *TaskHandler) UpdateTaskStatus(c *gin.Context) {
 		return
 	}
 	ResponseSuccess(c, "Task status updated successfully")
+}
+
+func (h *TaskHandler) DeleteTask(c *gin.Context) {
+	id := c.Param("id")
+	err := h.taskService.DeleteTask(id)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	ResponseSuccess(c, "Task deleted successfully")
 }

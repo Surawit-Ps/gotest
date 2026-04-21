@@ -51,6 +51,11 @@ func (m *MockTaskService) UpdateTaskStatus(id, status string) error {
 	return args.Error(0)
 }
 
+func (m *MockTaskService) DeleteTask(id string) error {
+	args := m.Called(id)
+	return args.Error(0)
+}
+
 // TestCreateTask - ทดสอบการสร้าง task ทั้ง success และ error cases
 func TestCreateTask(t *testing.T) {
 	gin.SetMode(gin.TestMode)

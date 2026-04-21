@@ -24,8 +24,8 @@ type Task struct {
 	Description string
 	Status      string
 	AssignName  string
-	CreateAt	 time.Time
-	UpdateAt	 time.Time
+	CreateAt    time.Time
+	UpdateAt    time.Time
 }
 
 func EntityToModel(task entity.Task) Task {
@@ -35,8 +35,8 @@ func EntityToModel(task entity.Task) Task {
 		Description: task.Description,
 		Status:      task.Status,
 		AssignName:  task.AssignName,
-		CreateAt:	 task.CreatedAt  ,
-		UpdateAt:	 task.UpdateAt,
+		CreateAt:    task.CreatedAt,
+		UpdateAt:    task.UpdateAt,
 	}
 }
 
@@ -47,6 +47,8 @@ func ModelToEntity(task Task) entity.Task {
 		Description: task.Description,
 		Status:      task.Status,
 		AssignName:  task.AssignName,
+		CreatedAt:   task.CreateAt,
+		UpdateAt:    task.UpdateAt,
 	}
 }
 
@@ -63,7 +65,7 @@ func (r taskRepositoryDB) AddTask(task entity.Task) error {
 	return nil
 }
 
-func (r taskRepositoryDB) GetTasks(assign_name string,status string, page int, limit int) ([]entity.Task, error) {
+func (r taskRepositoryDB) GetTasks(assign_name string, status string, page int, limit int) ([]entity.Task, error) {
 	var tasks []Task
 	query := r.db.Model(&Task{})
 	fmt.Print(query)
@@ -130,6 +132,22 @@ func (r taskRepositoryDB) EditTaskStatus(id string, status string) error {
 	task.Status = status
 	task.UpdateAt = time.Now()
 	err = r.db.Save(&task).Error
+	if err != nil {
+		return e.ErrDatabase
+	}
+	return nil
+}
+
+func (r taskRepositoryDB) RemoveTask(id string) error {
+	var task Task
+	err := r.db.First(&task, "id = ?", id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return e.ErrTaskNotFound
+		}
+		return e.ErrDatabase
+	}
+	err = r.db.Delete(&task).Error
 	if err != nil {
 		return e.ErrDatabase
 	}

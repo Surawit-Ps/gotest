@@ -18,8 +18,8 @@ func (s *taskService) CreateTask(task entity.Task) error {
 	return s.taskRepo.AddTask(task)
 }
 
-func (s *taskService) GetTasks(status string, assign_name string, page int, limit int) ([]entity.Task, error) {
-	return s.taskRepo.GetTasks(status, assign_name, page, limit)
+func (s *taskService) GetTasks(assign_name string, status string, page int, limit int) ([]entity.Task, error) {
+	return s.taskRepo.GetTasks(assign_name, status, page, limit)
 }
 
 func (s *taskService) GetATask(id string) (*entity.Task, error) {
@@ -37,9 +37,12 @@ func (s *taskService) UpdateTaskStatus(id string, status string) error {
 	}
 	if oldTask.Status == "done" {
 		return e.ErrStatusUnchanged
-	}else if oldTask.Status == status {
+	} else if oldTask.Status == status {
 		return e.ErrStatusUnchanged
 	}
 	return s.taskRepo.EditTaskStatus(id, status)
 }
 
+func (s *taskService) DeleteTask(id string) error {
+	return s.taskRepo.RemoveTask(id)
+}

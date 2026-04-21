@@ -2,9 +2,10 @@ package handler
 
 import (
 	"errors"
-	"github.com/go-playground/validator/v10"
-	"github.com/gin-gonic/gin"
 	"golangTest/pkg/errs"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type response struct {
@@ -14,9 +15,9 @@ type response struct {
 }
 
 var errorStatus = map[string]int{
-	errs.ErrTaskNotFound.Error(): 404,
-	errs.ErrInvalidInput.Error(): 400,
-	errs.ErrDatabase.Error(): 500,
+	errs.ErrTaskNotFound.Error():    404,
+	errs.ErrInvalidInput.Error():    400,
+	errs.ErrDatabase.Error():        500,
 	errs.ErrStatusUnchanged.Error(): 400,
 }
 
@@ -35,12 +36,12 @@ func parseError(err error) []string {
 }
 
 type errorResponse struct {
-	Success bool   `json:"success" example:"false"`
+	Success bool     `json:"success" example:"false"`
 	Message []string `json:"message" example:"Error message"`
 }
 
 func ResponseCreateSuccess(c *gin.Context, message string, data any) {
-	res :=  response{
+	res := response{
 		Success: true,
 		Message: message,
 		Data:    data,
@@ -49,7 +50,7 @@ func ResponseCreateSuccess(c *gin.Context, message string, data any) {
 }
 
 func ResponseSuccess(c *gin.Context, data any) {
-	res :=  response{
+	res := response{
 		Success: true,
 		Message: "Success",
 		Data:    data,
@@ -64,9 +65,8 @@ func ResponseError(message []string) errorResponse {
 	}
 }
 
-
 func handleError(c *gin.Context, err error) {
-	code, ok := errorStatus[err.Error()];
+	code, ok := errorStatus[err.Error()]
 	if !ok {
 		code = 500
 	}
