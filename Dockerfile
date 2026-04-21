@@ -1,20 +1,19 @@
-# Build stage
 FROM golang:1.25.0-alpine AS builder
 
-# Set working directory
+# ✅ เพิ่มตรงนี้
+RUN apk add --no-cache gcc musl-dev
+
 WORKDIR /app
 
-# Copy go mod files
 COPY go.mod go.sum ./
-
-# Download dependencies
 RUN go mod download
 
-# Copy source code
 COPY . .
 
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# ✅ เปิด CGO
+ENV CGO_ENABLED=1
+
+RUN go build -o main .
 
 # Final stage
 FROM alpine:latest

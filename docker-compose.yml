@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - db_data:/app/tasks.db
+      - db_data:/app/data
     environment:
       - GIN_MODE=release
     restart: unless-stopped
