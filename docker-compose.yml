@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - db_data:/app/tasks.db
+    environment:
+      - GIN_MODE=release
+    restart: unless-stopped
+
+volumes:
+  db_data:
